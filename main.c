@@ -7,28 +7,28 @@
 int main(void) {
 	struct Console* console = start();
 
-	char plane[WIDTH][HEIGHT];
+	char plane[HEIGHT][WIDTH];
 
 	srand(time(NULL));
-	for (int i = 0; i < WIDTH; i++) {
-		for (int j = 0; j < HEIGHT; j++) {
+	for (int i = 0; i < HEIGHT; i++) {
+		for (int j = 0; j < WIDTH; j++) {
 			int r = rand() % 2;
 			if (r == 0) {
 				plane[i][j] = '.';
 			}
 			else {
-				plane[i][j] = '#';
+				plane[i][j] = '.';
 			}
 		}
 	}
-
+/*
 	// glider
-/*	plane[0][1] = '#';
-	plane[1][2] = '#';
-	plane[2][0] = '#';
+	plane[1][0] = '#';
 	plane[2][1] = '#';
-	plane[2][2] = '#';*/
-
+	plane[0][2] = '#';
+	plane[1][2] = '#';
+	plane[2][2] = '#';
+*/
 	int generations = 0;
 	int menusize = 1;
 	int sleep = 100;
@@ -43,7 +43,7 @@ int main(void) {
 			break;
 		}
 
-		// speed
+
 		switch (input) {
 			case '+': {
 				if (sleep == 300)
@@ -60,7 +60,7 @@ int main(void) {
 			default: break;
 		}
 
-		// pause menu
+
 		if (input == ' ') {
 			int posrow = 0, poscol = 0;
 			while (1) {
@@ -86,20 +86,20 @@ int main(void) {
 						break;
 					}
 					case 's': {
-						if (posrow == WIDTH - 1)
+						if (posrow == HEIGHT - 1)
 							break;
 						posrow++;
 						break;
 					}
 					case 'd': {
-						if (poscol == HEIGHT - 1)
+						if (poscol == WIDTH - 1)
 							break;
 						poscol++;
 						break;
 					}
 					case 'r': {
-						for (int i = 0; i < WIDTH; i++) {
-							for (int j = 0; j < HEIGHT; j++) {
+						for (int i = 0; i < HEIGHT; i++) {
+							for (int j = 0; j < WIDTH; j++) {
 								int r = rand() % 2;
 								if (r == 0) {
 									plane[i][j] = '.';
@@ -118,7 +118,7 @@ int main(void) {
 					default: break;
 				}
 
-				set2darray(console, plane, 0 + menusize, 0, WIDTH, HEIGHT);
+				set2darray(console, (const char*)plane, 0 + menusize, 0, WIDTH, HEIGHT);
 
 				setcharcursor(console, '@', posrow + menusize, poscol);
 
@@ -126,9 +126,9 @@ int main(void) {
 			}
 		}
 
-		char new[WIDTH][HEIGHT];
-		for (int i = 0; i < WIDTH; ++i) {
-			for (int j = 0; j < HEIGHT; ++j) {
+		char new[HEIGHT][WIDTH];
+		for (int i = 0; i < HEIGHT; ++i) {
+			for (int j = 0; j < WIDTH; ++j) {
 				new[i][j] = '.';
 				int neighbours = 0;
 
@@ -137,8 +137,8 @@ int main(void) {
 						if (k == 0 && l == 0)
 							continue;
 
-						int row = (i + k + WIDTH) % WIDTH;
-						int col = (j + l + HEIGHT) % HEIGHT;
+						int row = (i + k + HEIGHT) % HEIGHT;
+						int col = (j + l + WIDTH) % WIDTH;
 
 						if (plane[row][col] == '#') {
 							neighbours++;
@@ -146,15 +146,16 @@ int main(void) {
 					}
 				}
 
-				if (plane[i][j] == '.' && neighbours == 3)
+				if (plane[i][j] == '.' && neighbours == 3) {
 					new[i][j] = '#';
+				}
 				else if (plane[i][j] == '#' && (neighbours == 2 || neighbours == 3)) {
 					new[i][j] = '#';
 				}
 			}
 		}
 
-		set2darray(console, plane, 0 + menusize, 0, WIDTH, HEIGHT);
+		set2darray(console, (const char*)plane, 0 + menusize, 0, WIDTH, HEIGHT);
 
 		memcpy(plane, new, WIDTH * HEIGHT * sizeof(char));
 
